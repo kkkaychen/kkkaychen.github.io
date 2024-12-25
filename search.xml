@@ -70,6 +70,22 @@
       </tags>
   </entry>
   <entry>
+    <title>VSCode Vue3 自訂義模板</title>
+    <url>/2024/12/24/vscode-v3-template/</url>
+    <content><![CDATA[<h2 id="1-打開-設定中的-Snippets"><a href="#1-打開-設定中的-Snippets" class="headerlink" title="1. 打開 設定中的 Snippets"></a>1. 打開 設定中的 Snippets</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-01.png" alt="Snippets"></p>
+<span id="more"></span>
+
+<h2 id="2-輸入-vue-json"><a href="#2-輸入-vue-json" class="headerlink" title="2. 輸入 vue.json"></a>2. 輸入 vue.json</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-02.png" alt="vue.json"></p>
+<h2 id="3-在-vue-json-檔案中貼上模板"><a href="#3-在-vue-json-檔案中貼上模板" class="headerlink" title="3. 在 vue.json 檔案中貼上模板"></a>3. 在 vue.json 檔案中貼上模板</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Print to console&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;prefix&quot;</span><span class="punctuation">:</span> <span class="string">&quot;v3&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;body&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;&lt;template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;/div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;script setup lang=\\&quot;</span>ts\\<span class="string">&quot; name=\\&quot;</span>\\<span class="string">&quot;&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/script&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;style scoped&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/style&gt;&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue3&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-vue-檔輸入-v3"><a href="#4-vue-檔輸入-v3" class="headerlink" title="4. vue 檔輸入 v3"></a>4. vue 檔輸入 v3</h2><p>在 vue 檔輸入快捷鍵 v3，就會有自訂義模板了<br><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-03.gif" alt="vue"></p>
+]]></content>
+      <tags>
+        <tag>Vue</tag>
+        <tag>VSCode</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>筆記：Docker 網路模式</title>
     <url>/2024/12/25/docker-network-mode/</url>
     <content><![CDATA[<h2 id="Docker-網路模式有什麼作用？"><a href="#Docker-網路模式有什麼作用？" class="headerlink" title="Docker 網路模式有什麼作用？"></a>Docker 網路模式有什麼作用？</h2><h2 id="透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"><a href="#透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。" class="headerlink" title="透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"></a>透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。<br><span id="more"></span></h2><h2 id="Docker-網路模式有哪些？"><a href="#Docker-網路模式有哪些？" class="headerlink" title="Docker 網路模式有哪些？"></a>Docker 網路模式有哪些？</h2><h3 id="1-Bridge-Network"><a href="#1-Bridge-Network" class="headerlink" title="1. Bridge Network"></a><strong>1. Bridge Network</strong></h3><ul>
@@ -104,22 +120,6 @@
 ]]></content>
       <tags>
         <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VSCode Vue3 自訂義模板</title>
-    <url>/2024/12/24/vscode-v3-template/</url>
-    <content><![CDATA[<h2 id="1-打開-設定中的-Snippets"><a href="#1-打開-設定中的-Snippets" class="headerlink" title="1. 打開 設定中的 Snippets"></a>1. 打開 設定中的 Snippets</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-01.png" alt="Snippets"></p>
-<span id="more"></span>
-
-<h2 id="2-輸入-vue-json"><a href="#2-輸入-vue-json" class="headerlink" title="2. 輸入 vue.json"></a>2. 輸入 vue.json</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-02.png" alt="vue.json"></p>
-<h2 id="3-在-vue-json-檔案中貼上模板"><a href="#3-在-vue-json-檔案中貼上模板" class="headerlink" title="3. 在 vue.json 檔案中貼上模板"></a>3. 在 vue.json 檔案中貼上模板</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Print to console&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;prefix&quot;</span><span class="punctuation">:</span> <span class="string">&quot;v3&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;body&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;&lt;template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;/div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;script setup lang=\\&quot;</span>ts\\<span class="string">&quot; name=\\&quot;</span>\\<span class="string">&quot;&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/script&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;style scoped&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/style&gt;&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue3&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="4-vue-檔輸入-v3"><a href="#4-vue-檔輸入-v3" class="headerlink" title="4. vue 檔輸入 v3"></a>4. vue 檔輸入 v3</h2><p>在 vue 檔輸入快捷鍵 v3，就會有自訂義模板了<br><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-03.gif" alt="vue"></p>
-]]></content>
-      <tags>
-        <tag>Vue</tag>
-        <tag>VSCode</tag>
       </tags>
   </entry>
 </search>
