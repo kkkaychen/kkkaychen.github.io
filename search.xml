@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>怎麼用 Docker 建立 MySQL 容器？</title>
+    <url>/2024/12/24/docker-build-mysql-container/</url>
+    <content><![CDATA[<h2 id="安裝-Docker-Desktop"><a href="#安裝-Docker-Desktop" class="headerlink" title="安裝 Docker Desktop"></a>安裝 Docker Desktop</h2><ol>
+<li>前往 <a href="https://docs.docker.com/get-started/get-docker/">Docker 官網</a>安裝 Docker Desktop</li>
+<li>安裝完成後，開啟 Docker Desktop</li>
+<li>開啟 CMD 或 終端機查看 Docker 版本，如果有看到終端機回傳版本號代表 Docker 安裝成功了。</li>
+</ol>
+<span id="more"></span>
+
+<h2 id="下載-MySQL-image-映像檔"><a href="#下載-MySQL-image-映像檔" class="headerlink" title="下載 MySQL image (映像檔)"></a>下載 MySQL image (映像檔)</h2><ol>
+<li><p>在終端機輸入下載 MySQL8.0 映像檔 image 指令，Docker 會自動從 Docker Hub 下載官方的 MySQL 映像檔</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull mysql:8.0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看是否有下載成功，如果有下載成功就會看到 mysql 8.0 項目</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="啟動-MySQL-容器"><a href="#啟動-MySQL-容器" class="headerlink" title="啟動 MySQL 容器"></a>啟動 MySQL 容器</h2><ol>
+<li><p>啟動 MySQL 容器指令，這邊用 3308 port 是因為本機已經有一個 MySQL 環境了，如果用 <code>-p 3306:3306</code> 會有衝突。</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run --name mysql-container \ # 自訂容器名稱</span><br><span class="line">-e MYSQL_ROOT_PASSWORD=root1234 \ # 自訂 root 使用者密碼</span><br><span class="line">-e MYSQL_DATABASE=test_db \ # 自訂資料庫名稱</span><br><span class="line">-e MYSQL_USER=test_user \ # 自訂使用者名稱</span><br><span class="line">-e MYSQL_PASSWORD=test1234 \ # 自訂使用者密碼</span><br><span class="line">-p 3308:3306 \ # 將本機 3308 port 號映射到容器的 3306 port 號</span><br><span class="line">-d mysql:8.0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看容器是否有起成功</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="本機連-Docker-中的-MySQL"><a href="#本機連-Docker-中的-MySQL" class="headerlink" title="本機連 Docker 中的 MySQL"></a>本機連 Docker 中的 MySQL</h2><ol>
+<li>開啟本機 MySQL Workbench，新增一組 Connection</li>
+<li>填寫連線資訊：<ul>
+<li>Hostname: 127.0.0.1</li>
+<li>Port: 3308</li>
+<li>Username: test_user</li>
+<li>Password: test1234</li>
+</ul>
+</li>
+<li>連線成功會看到當初在啟動容器時初始化建立的資料庫 <code>test_db</code></li>
+</ol>
+<h3 id="相關文章"><a href="#相關文章" class="headerlink" title="相關文章"></a>相關文章</h3><ul>
+<li><a href="https://kkkaychen.github.io/2024/12/25/docker-network-mode/">筆記：Docker 網路模式</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+        <tag>MySQL</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>筆記：Docker 網路模式</title>
     <url>/2024/12/25/docker-network-mode/</url>
     <content><![CDATA[<h2 id="Docker-網路模式有什麼作用？"><a href="#Docker-網路模式有什麼作用？" class="headerlink" title="Docker 網路模式有什麼作用？"></a>Docker 網路模式有什麼作用？</h2><h2 id="透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"><a href="#透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。" class="headerlink" title="透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"></a>透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。<br><span id="more"></span></h2><h2 id="Docker-網路模式有哪些？"><a href="#Docker-網路模式有哪些？" class="headerlink" title="Docker 網路模式有哪些？"></a>Docker 網路模式有哪些？</h2><h3 id="1-Bridge-Network"><a href="#1-Bridge-Network" class="headerlink" title="1. Bridge Network"></a><strong>1. Bridge Network</strong></h3><ul>
@@ -76,50 +120,6 @@
       <tags>
         <tag>Vue</tag>
         <tag>VSCode</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>怎麼用 Docker 建立 MySQL 容器？</title>
-    <url>/2024/12/24/docker-build-mysql-container/</url>
-    <content><![CDATA[<h2 id="安裝-Docker-Desktop"><a href="#安裝-Docker-Desktop" class="headerlink" title="安裝 Docker Desktop"></a>安裝 Docker Desktop</h2><ol>
-<li>前往 <a href="https://docs.docker.com/get-started/get-docker/">Docker 官網</a>安裝 Docker Desktop</li>
-<li>安裝完成後，開啟 Docker Desktop</li>
-<li>開啟 CMD 或 終端機查看 Docker 版本，如果有看到終端機回傳版本號代表 Docker 安裝成功了。</li>
-</ol>
-<span id="more"></span>
-
-<h2 id="下載-MySQL-image-映像檔"><a href="#下載-MySQL-image-映像檔" class="headerlink" title="下載 MySQL image (映像檔)"></a>下載 MySQL image (映像檔)</h2><ol>
-<li><p>在終端機輸入下載 MySQL8.0 映像檔 image 指令，Docker 會自動從 Docker Hub 下載官方的 MySQL 映像檔</p>
- <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker pull mysql:8.0</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看是否有下載成功，如果有下載成功就會看到 mysql 8.0 項目</p>
- <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="啟動-MySQL-容器"><a href="#啟動-MySQL-容器" class="headerlink" title="啟動 MySQL 容器"></a>啟動 MySQL 容器</h2><ol>
-<li><p>啟動 MySQL 容器指令，這邊用 3308 port 是因為本機已經有一個 MySQL 環境了，如果用 <code>-p 3306:3306</code> 會有衝突。</p>
- <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker run --name mysql-container \ # 自訂容器名稱</span><br><span class="line">-e MYSQL_ROOT_PASSWORD=root1234 \ # 自訂 root 使用者密碼</span><br><span class="line">-e MYSQL_DATABASE=test_db \ # 自訂資料庫名稱</span><br><span class="line">-e MYSQL_USER=test_user \ # 自訂使用者名稱</span><br><span class="line">-e MYSQL_PASSWORD=test1234 \ # 自訂使用者密碼</span><br><span class="line">-p 3308:3306 \ # 將本機 3308 port 號映射到容器的 3306 port 號</span><br><span class="line">-d mysql:8.0</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看容器是否有起成功</p>
- <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="本機連-Docker-中的-MySQL"><a href="#本機連-Docker-中的-MySQL" class="headerlink" title="本機連 Docker 中的 MySQL"></a>本機連 Docker 中的 MySQL</h2><ol>
-<li>開啟本機 MySQL Workbench，新增一組 Connection</li>
-<li>填寫連線資訊：<ul>
-<li>Hostname: 127.0.0.1</li>
-<li>Port: 3308</li>
-<li>Username: test_user</li>
-<li>Password: test1234</li>
-</ul>
-</li>
-<li>連線成功會看到當初在啟動容器時初始化建立的資料庫 <code>test_db</code></li>
-</ol>
-<h3 id="相關文章"><a href="#相關文章" class="headerlink" title="相關文章"></a>相關文章</h3><ul>
-<li><a href="https://kkkaychen.github.io/2024/12/25/docker-network-mode/">筆記：Docker 網路模式</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-        <tag>MySQL</tag>
       </tags>
   </entry>
 </search>
