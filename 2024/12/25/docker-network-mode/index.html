@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"kkkaychen.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Docker 網路模式有什麼作用？透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="筆記：Docker 網路模式">
+<meta property="og:url" content="https://kkkaychen.github.io/2024/12/25/docker-network-mode/index.html">
+<meta property="og:site_name" content="碼農筆記">
+<meta property="og:description" content="Docker 網路模式有什麼作用？透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。">
+<meta property="og:locale" content="zh_TW">
+<meta property="article:published_time" content="2024-12-25T07:36:37.000Z">
+<meta property="article:modified_time" content="2024-12-25T08:08:12.194Z">
+<meta property="article:author" content="爪哇程序猿">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://kkkaychen.github.io/2024/12/25/docker-network-mode/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-tw'
+  };
+</script>
+
+  <title>筆記：Docker 網路模式 | 碼農筆記</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">碼農筆記</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-tw">
+    <link itemprop="mainEntityOfPage" href="https://kkkaychen.github.io/2024/12/25/docker-network-mode/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="爪哇程序猿">
+      <meta itemprop="description" content="開發路上腳流血的學習歷程">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="碼農筆記">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          筆記：Docker 網路模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-12-25 15:36:37 / Modified: 16:08:12" itemprop="dateCreated datePublished" datetime="2024-12-25T15:36:37+08:00">2024-12-25</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Docker-網路模式有什麼作用？"><a href="#Docker-網路模式有什麼作用？" class="headerlink" title="Docker 網路模式有什麼作用？"></a>Docker 網路模式有什麼作用？</h2><h2 id="透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"><a href="#透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。" class="headerlink" title="透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"></a>透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。<br><span id="more"></span></h2><h2 id="Docker-網路模式有哪些？"><a href="#Docker-網路模式有哪些？" class="headerlink" title="Docker 網路模式有哪些？"></a>Docker 網路模式有哪些？</h2><h3 id="1-Bridge-Network"><a href="#1-Bridge-Network" class="headerlink" title="1. Bridge Network"></a><strong>1. Bridge Network</strong></h3><ul>
+<li>容器用虛擬網路通訊，需 Port Mapping，適合單機測試或開發，特別是測試或開發階段。</li>
+</ul>
+<h3 id="2-Host-Network"><a href="#2-Host-Network" class="headerlink" title="2. Host Network"></a><strong>2. Host Network</strong></h3><ul>
+<li>容器用主機網路，無需埠對映，適合高效能需求。例如： Redis 集群或需要低延遲的應用。</li>
+</ul>
+<h3 id="3-None-Network"><a href="#3-None-Network" class="headerlink" title="3. None Network"></a><strong>3. None Network</strong></h3><ul>
+<li>無網路配置，完全隔離</li>
+</ul>
+<h3 id="4-Container-Network"><a href="#4-Container-Network" class="headerlink" title="4. Container Network"></a><strong>4. Container Network</strong></h3><ul>
+<li>多容器共用網路堆疊，用 <code>localhost</code> 通訊，適合 Sidecar 模式。</li>
+</ul>
+<h3 id="5-Overlay-Network"><a href="#5-Overlay-Network" class="headerlink" title="5. Overlay Network"></a><strong>5. Overlay Network</strong></h3><ul>
+<li>跨主機通訊，有加密功能，適合微服務或分散式系統。</li>
+</ul>
+<h3 id="6-Macvlan-Network"><a href="#6-Macvlan-Network" class="headerlink" title="6. Macvlan Network"></a><strong>6. Macvlan Network</strong></h3><ul>
+<li>容器像實體設備，擁有獨立 IP，適合物聯網應用。</li>
+</ul>
+<hr>
+<h2 id="範例：用-Docker-Compose-設置自訂網路"><a href="#範例：用-Docker-Compose-設置自訂網路" class="headerlink" title="範例：用 Docker Compose 設置自訂網路"></a>範例：用 Docker Compose 設置自訂網路</h2><h3 id="docker-compose-yml"><a href="#docker-compose-yml" class="headerlink" title="docker-compose.yml"></a><code>docker-compose.yml</code></h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.9&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">db:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">mysql-db</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">example</span></span><br><span class="line">      <span class="attr">MYSQL_DATABASE:</span> <span class="string">testdb</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">custom-bridge</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD&quot;</span>, <span class="string">&quot;mysqladmin&quot;</span>, <span class="string">&quot;ping&quot;</span>, <span class="string">&quot;-h&quot;</span>, <span class="string">&quot;localhost&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">springboot-app:latest</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">springboot-app</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="attr">db:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">custom-bridge</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">custom-bridge:</span></span><br><span class="line">    <span class="attr">driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>自訂網路</strong>：<code>custom-bridge</code> 讓 <code>app</code> 和 <code>db</code> 這兩個容器之間可直接通訊。</li>
+<li><strong>健康檢查</strong>：MySQL 使用 <code>healthcheck</code> 確認服務成功跑起來後，Spring Boot 才啟動。</li>
+<li><strong>服務依賴</strong>：透過 <code>depends_on</code> 配置，讓 Spring Boot 等待 MySQL 正常運行。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/25/3min-change-springboot-banner/" rel="prev" title="3 分鐘換 SpringBoot banner">
+      <i class="fa fa-chevron-left"></i> 3 分鐘換 SpringBoot banner
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-%E7%B6%B2%E8%B7%AF%E6%A8%A1%E5%BC%8F%E6%9C%89%E4%BB%80%E9%BA%BC%E4%BD%9C%E7%94%A8%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">Docker 網路模式有什麼作用？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%8F%E9%81%8E-Docker-%E7%B6%B2%E8%B7%AF%E6%A8%A1%E5%BC%8F%EF%BC%8C%E5%8F%AF%E4%BB%A5%E6%96%B9%E4%BE%BF%E7%AE%A1%E7%90%86%E5%AE%B9%E5%99%A8%E8%88%87%E5%A4%96%E9%83%A8%E6%88%96%E5%AE%B9%E5%99%A8%E5%92%8C%E5%AE%B9%E5%99%A8%E4%B9%8B%E9%96%93%E7%9A%84%E9%80%9A%E8%A8%8A%E3%80%82"><span class="nav-number">2.</span> <span class="nav-text">透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-%E7%B6%B2%E8%B7%AF%E6%A8%A1%E5%BC%8F%E6%9C%89%E5%93%AA%E4%BA%9B%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">Docker 網路模式有哪些？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Bridge-Network"><span class="nav-number">3.1.</span> <span class="nav-text">1. Bridge Network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Host-Network"><span class="nav-number">3.2.</span> <span class="nav-text">2. Host Network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-None-Network"><span class="nav-number">3.3.</span> <span class="nav-text">3. None Network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Container-Network"><span class="nav-number">3.4.</span> <span class="nav-text">4. Container Network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Overlay-Network"><span class="nav-number">3.5.</span> <span class="nav-text">5. Overlay Network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Macvlan-Network"><span class="nav-number">3.6.</span> <span class="nav-text">6. Macvlan Network</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AF%84%E4%BE%8B%EF%BC%9A%E7%94%A8-Docker-Compose-%E8%A8%AD%E7%BD%AE%E8%87%AA%E8%A8%82%E7%B6%B2%E8%B7%AF"><span class="nav-number">4.</span> <span class="nav-text">範例：用 Docker Compose 設置自訂網路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#docker-compose-yml"><span class="nav-number">4.1.</span> <span class="nav-text">docker-compose.yml</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">爪哇程序猿</p>
+  <div class="site-description" itemprop="description">開發路上腳流血的學習歷程</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">爪哇程序猿</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
