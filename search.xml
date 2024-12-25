@@ -1,6 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>筆記：Docker 網路模式</title>
+    <url>/2024/12/25/docker-network-mode/</url>
+    <content><![CDATA[<h2 id="Docker-網路模式有什麼作用？"><a href="#Docker-網路模式有什麼作用？" class="headerlink" title="Docker 網路模式有什麼作用？"></a>Docker 網路模式有什麼作用？</h2><h2 id="透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"><a href="#透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。" class="headerlink" title="透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"></a>透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。<br><span id="more"></span></h2><h2 id="Docker-網路模式有哪些？"><a href="#Docker-網路模式有哪些？" class="headerlink" title="Docker 網路模式有哪些？"></a>Docker 網路模式有哪些？</h2><h3 id="1-Bridge-Network"><a href="#1-Bridge-Network" class="headerlink" title="1. Bridge Network"></a><strong>1. Bridge Network</strong></h3><ul>
+<li>容器用虛擬網路通訊，需 Port Mapping，適合單機測試或開發，特別是測試或開發階段。</li>
+</ul>
+<h3 id="2-Host-Network"><a href="#2-Host-Network" class="headerlink" title="2. Host Network"></a><strong>2. Host Network</strong></h3><ul>
+<li>容器用主機網路，無需埠對映，適合高效能需求。例如： Redis 集群或需要低延遲的應用。</li>
+</ul>
+<h3 id="3-None-Network"><a href="#3-None-Network" class="headerlink" title="3. None Network"></a><strong>3. None Network</strong></h3><ul>
+<li>無網路配置，完全隔離</li>
+</ul>
+<h3 id="4-Container-Network"><a href="#4-Container-Network" class="headerlink" title="4. Container Network"></a><strong>4. Container Network</strong></h3><ul>
+<li>多容器共用網路堆疊，用 <code>localhost</code> 通訊，適合 Sidecar 模式。</li>
+</ul>
+<h3 id="5-Overlay-Network"><a href="#5-Overlay-Network" class="headerlink" title="5. Overlay Network"></a><strong>5. Overlay Network</strong></h3><ul>
+<li>跨主機通訊，有加密功能，適合微服務或分散式系統。</li>
+</ul>
+<h3 id="6-Macvlan-Network"><a href="#6-Macvlan-Network" class="headerlink" title="6. Macvlan Network"></a><strong>6. Macvlan Network</strong></h3><ul>
+<li>容器像實體設備，擁有獨立 IP，適合物聯網應用。</li>
+</ul>
+<hr>
+<h2 id="範例：用-Docker-Compose-設置自訂網路"><a href="#範例：用-Docker-Compose-設置自訂網路" class="headerlink" title="範例：用 Docker Compose 設置自訂網路"></a>範例：用 Docker Compose 設置自訂網路</h2><h3 id="docker-compose-yml"><a href="#docker-compose-yml" class="headerlink" title="docker-compose.yml"></a><code>docker-compose.yml</code></h3><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.9&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">db:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">mysql-db</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">example</span></span><br><span class="line">      <span class="attr">MYSQL_DATABASE:</span> <span class="string">testdb</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">custom-bridge</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;3307:3306&quot;</span>  <span class="comment"># 將本機的 3307 port映射到容器的 3306 port</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD&quot;</span>, <span class="string">&quot;mysqladmin&quot;</span>, <span class="string">&quot;ping&quot;</span>, <span class="string">&quot;-h&quot;</span>, <span class="string">&quot;localhost&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">springboot-app:latest</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">springboot-app</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="attr">db:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">custom-bridge</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">custom-bridge:</span></span><br><span class="line">    <span class="attr">driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>自訂網路</strong>：<code>custom-bridge</code> 讓 <code>app</code> 和 <code>db</code> 這兩個容器之間可直接通訊。</li>
+<li><strong>健康檢查</strong>：MySQL 使用 <code>healthcheck</code> 確認服務成功跑起來後，Spring Boot 才啟動。</li>
+<li><strong>服務依賴</strong>：透過 <code>depends_on</code> 配置，讓 Spring Boot 等待 MySQL 正常運行。</li>
+</ul>
+<h3 id="相關文章"><a href="#相關文章" class="headerlink" title="相關文章"></a>相關文章</h3><ul>
+<li><a href="https://kkkaychen.github.io/2024/12/24/docker-build-mysql-container/">怎麼用 Docker 建立 MySQL 容器？</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>3 分鐘換 SpringBoot banner</title>
     <url>/2024/12/25/3min-change-springboot-banner/</url>
     <content><![CDATA[<p>預設的 SpringBoot banner 看得有點膩了？簡單七個步驟就可以讓 SpringBoot 專案換 banner</p>
@@ -23,6 +60,22 @@
       <tags>
         <tag>SpringBoot</tag>
         <tag>Java</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VSCode Vue3 自訂義模板</title>
+    <url>/2024/12/24/vscode-v3-template/</url>
+    <content><![CDATA[<h2 id="1-打開-設定中的-Snippets"><a href="#1-打開-設定中的-Snippets" class="headerlink" title="1. 打開 設定中的 Snippets"></a>1. 打開 設定中的 Snippets</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-01.png" alt="Snippets"></p>
+<span id="more"></span>
+
+<h2 id="2-輸入-vue-json"><a href="#2-輸入-vue-json" class="headerlink" title="2. 輸入 vue.json"></a>2. 輸入 vue.json</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-02.png" alt="vue.json"></p>
+<h2 id="3-在-vue-json-檔案中貼上模板"><a href="#3-在-vue-json-檔案中貼上模板" class="headerlink" title="3. 在 vue.json 檔案中貼上模板"></a>3. 在 vue.json 檔案中貼上模板</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Print to console&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;prefix&quot;</span><span class="punctuation">:</span> <span class="string">&quot;v3&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;body&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;&lt;template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;/div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;script setup lang=\\&quot;</span>ts\\<span class="string">&quot; name=\\&quot;</span>\\<span class="string">&quot;&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/script&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;style scoped&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/style&gt;&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue3&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-vue-檔輸入-v3"><a href="#4-vue-檔輸入-v3" class="headerlink" title="4. vue 檔輸入 v3"></a>4. vue 檔輸入 v3</h2><p>在 vue 檔輸入快捷鍵 v3，就會有自訂義模板了<br><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-03.gif" alt="vue"></p>
+]]></content>
+      <tags>
+        <tag>Vue</tag>
+        <tag>VSCode</tag>
       </tags>
   </entry>
   <entry>
@@ -67,59 +120,6 @@
       <tags>
         <tag>Docker</tag>
         <tag>MySQL</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>筆記：Docker 網路模式</title>
-    <url>/2024/12/25/docker-network-mode/</url>
-    <content><![CDATA[<h2 id="Docker-網路模式有什麼作用？"><a href="#Docker-網路模式有什麼作用？" class="headerlink" title="Docker 網路模式有什麼作用？"></a>Docker 網路模式有什麼作用？</h2><h2 id="透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"><a href="#透過-Docker-網路模式，可以方便管理容器與外部或容器和容器之間的通訊。" class="headerlink" title="透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。"></a>透過 Docker 網路模式，可以方便管理容器與外部或容器和容器之間的通訊。<br><span id="more"></span></h2><h2 id="Docker-網路模式有哪些？"><a href="#Docker-網路模式有哪些？" class="headerlink" title="Docker 網路模式有哪些？"></a>Docker 網路模式有哪些？</h2><h3 id="1-Bridge-Network"><a href="#1-Bridge-Network" class="headerlink" title="1. Bridge Network"></a><strong>1. Bridge Network</strong></h3><ul>
-<li>容器用虛擬網路通訊，需 Port Mapping，適合單機測試或開發，特別是測試或開發階段。</li>
-</ul>
-<h3 id="2-Host-Network"><a href="#2-Host-Network" class="headerlink" title="2. Host Network"></a><strong>2. Host Network</strong></h3><ul>
-<li>容器用主機網路，無需埠對映，適合高效能需求。例如： Redis 集群或需要低延遲的應用。</li>
-</ul>
-<h3 id="3-None-Network"><a href="#3-None-Network" class="headerlink" title="3. None Network"></a><strong>3. None Network</strong></h3><ul>
-<li>無網路配置，完全隔離</li>
-</ul>
-<h3 id="4-Container-Network"><a href="#4-Container-Network" class="headerlink" title="4. Container Network"></a><strong>4. Container Network</strong></h3><ul>
-<li>多容器共用網路堆疊，用 <code>localhost</code> 通訊，適合 Sidecar 模式。</li>
-</ul>
-<h3 id="5-Overlay-Network"><a href="#5-Overlay-Network" class="headerlink" title="5. Overlay Network"></a><strong>5. Overlay Network</strong></h3><ul>
-<li>跨主機通訊，有加密功能，適合微服務或分散式系統。</li>
-</ul>
-<h3 id="6-Macvlan-Network"><a href="#6-Macvlan-Network" class="headerlink" title="6. Macvlan Network"></a><strong>6. Macvlan Network</strong></h3><ul>
-<li>容器像實體設備，擁有獨立 IP，適合物聯網應用。</li>
-</ul>
-<hr>
-<h2 id="範例：用-Docker-Compose-設置自訂網路"><a href="#範例：用-Docker-Compose-設置自訂網路" class="headerlink" title="範例：用 Docker Compose 設置自訂網路"></a>範例：用 Docker Compose 設置自訂網路</h2><h3 id="docker-compose-yml"><a href="#docker-compose-yml" class="headerlink" title="docker-compose.yml"></a><code>docker-compose.yml</code></h3><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.9&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">db:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql:8.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">mysql-db</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="string">example</span></span><br><span class="line">      <span class="attr">MYSQL_DATABASE:</span> <span class="string">testdb</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">custom-bridge</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;3307:3306&quot;</span>  <span class="comment"># 將本機的 3307 port映射到容器的 3306 port</span></span><br><span class="line">    <span class="attr">healthcheck:</span></span><br><span class="line">      <span class="attr">test:</span> [<span class="string">&quot;CMD&quot;</span>, <span class="string">&quot;mysqladmin&quot;</span>, <span class="string">&quot;ping&quot;</span>, <span class="string">&quot;-h&quot;</span>, <span class="string">&quot;localhost&quot;</span>]</span><br><span class="line">      <span class="attr">interval:</span> <span class="string">10s</span></span><br><span class="line">      <span class="attr">timeout:</span> <span class="string">5s</span></span><br><span class="line">      <span class="attr">retries:</span> <span class="number">5</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">app:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">springboot-app:latest</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">springboot-app</span></span><br><span class="line">    <span class="attr">depends_on:</span></span><br><span class="line">      <span class="attr">db:</span></span><br><span class="line">        <span class="attr">condition:</span> <span class="string">service_healthy</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">custom-bridge</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&quot;8080:8080&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">custom-bridge:</span></span><br><span class="line">    <span class="attr">driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><strong>自訂網路</strong>：<code>custom-bridge</code> 讓 <code>app</code> 和 <code>db</code> 這兩個容器之間可直接通訊。</li>
-<li><strong>健康檢查</strong>：MySQL 使用 <code>healthcheck</code> 確認服務成功跑起來後，Spring Boot 才啟動。</li>
-<li><strong>服務依賴</strong>：透過 <code>depends_on</code> 配置，讓 Spring Boot 等待 MySQL 正常運行。</li>
-</ul>
-<h3 id="相關文章"><a href="#相關文章" class="headerlink" title="相關文章"></a>相關文章</h3><ul>
-<li><a href="https://kkkaychen.github.io/2024/12/24/docker-build-mysql-container/">怎麼用 Docker 建立 MySQL 容器？</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Docker</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>VSCode Vue3 自訂義模板</title>
-    <url>/2024/12/24/vscode-v3-template/</url>
-    <content><![CDATA[<h2 id="1-打開-設定中的-Snippets"><a href="#1-打開-設定中的-Snippets" class="headerlink" title="1. 打開 設定中的 Snippets"></a>1. 打開 設定中的 Snippets</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-01.png" alt="Snippets"></p>
-<span id="more"></span>
-
-<h2 id="2-輸入-vue-json"><a href="#2-輸入-vue-json" class="headerlink" title="2. 輸入 vue.json"></a>2. 輸入 vue.json</h2><p><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-02.png" alt="vue.json"></p>
-<h2 id="3-在-vue-json-檔案中貼上模板"><a href="#3-在-vue-json-檔案中貼上模板" class="headerlink" title="3. 在 vue.json 檔案中貼上模板"></a>3. 在 vue.json 檔案中貼上模板</h2><figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;Print to console&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;scope&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;prefix&quot;</span><span class="punctuation">:</span> <span class="string">&quot;v3&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;body&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">            <span class="string">&quot;&lt;template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$0    &lt;/div&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/template&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;script setup lang=\\&quot;</span>ts\\<span class="string">&quot; name=\\&quot;</span>\\<span class="string">&quot;&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/script&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;style scoped&gt;&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;$4&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="string">&quot;&lt;/style&gt;&quot;</span></span><br><span class="line">        <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;vue3&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="4-vue-檔輸入-v3"><a href="#4-vue-檔輸入-v3" class="headerlink" title="4. vue 檔輸入 v3"></a>4. vue 檔輸入 v3</h2><p>在 vue 檔輸入快捷鍵 v3，就會有自訂義模板了<br><img src="/2024/12/24/vscode-v3-template/vscode-v3-template-03.gif" alt="vue"></p>
-]]></content>
-      <tags>
-        <tag>Vue</tag>
-        <tag>VSCode</tag>
       </tags>
   </entry>
 </search>
