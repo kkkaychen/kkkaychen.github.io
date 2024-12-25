@@ -7,7 +7,11 @@
 <span id="more"></span>
 
 <ol>
-<li>前往 <a href="https://devops.datenkollektiv.de/banner.txt/index.html">https://devops.datenkollektiv.de/banner.txt/index.html</a> 或 <a href="https://patorjk.com/software/taag/">https://patorjk.com/software/taag/</a> 兩個網站</li>
+<li>前往 Banner 字型網站<ul>
+<li><a href="https://devops.datenkollektiv.de/banner.txt/index.html">https://devops.datenkollektiv.de/banner.txt/index.html</a></li>
+<li><a href="https://patorjk.com/software/taag/">https://patorjk.com/software/taag/</a></li>
+</ul>
+</li>
 <li>輸入 Banner 要呈現的字</li>
 <li>選擇字型</li>
 <li>複製<br><img src="/2024/12/25/3min-change-springboot-banner/3min-change-springboot-banner-01.png" alt="步驟 2/3/4"></li>
