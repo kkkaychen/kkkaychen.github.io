@@ -11,7 +11,7 @@
 <li>輸入 Banner 要呈現的字</li>
 <li>選擇字型</li>
 <li>複製<br><img src="/2024/12/25/3min-change-springboot-banner/3min-change-springboot-banner-01.png" alt="步驟 2/3/4"></li>
-<li>回到 SpringBoot 專案在 src&#x2F;main&#x2F;resources&#x2F; 目錄下新增 banner.txt</li>
+<li>回到 SpringBoot 專案在 <code>src/main/resources/</code> 目錄下新增 <code>banner.txt</code></li>
 <li>貼上<br><img src="/2024/12/25/3min-change-springboot-banner/3min-change-springboot-banner-02.png" alt="步驟 5/6"></li>
 <li>運行<br><img src="/2024/12/25/3min-change-springboot-banner/3min-change-springboot-banner-03.png" alt="步驟 7"></li>
 </ol>
